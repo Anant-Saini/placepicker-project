@@ -1,8 +1,9 @@
-import { Component, signal } from '@angular/core';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
 
 import { Place } from '../place.model';
 import { PlacesComponent } from '../places.component';
 import { PlacesContainerComponent } from '../places-container/places-container.component';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-available-places',
@@ -13,4 +14,22 @@ import { PlacesContainerComponent } from '../places-container/places-container.c
 })
 export class AvailablePlacesComponent {
   places = signal<Place[] | undefined>(undefined);
+
+  private httpClient = inject(HttpClient);
+  private destroyRef = inject(DestroyRef);
+
+  ngOnInit() {
+    const subscription = this.httpClient
+      .get<{ places: Place[] }>('http://localhost:3000/places')
+      .subscribe({
+        next: (response) => {
+          console.log('Response from API:', response.places);
+        },
+        error: (error) => {
+          console.error('Error fetching places:', error);
+        },
+      });
+
+    this.destroyRef.onDestroy(() => subscription.unsubscribe());
+  }
 }
