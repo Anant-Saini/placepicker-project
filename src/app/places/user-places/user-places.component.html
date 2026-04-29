@@ -1,3 +1,13 @@
 <app-places-container title="Your Favorite Places">
-  <p>Todo...</p>
+  @if (isFetching() && !error()) {
+    <p class="fallback-text">Loading your favorite places...</p>
+  }
+  @if (error()) {
+    <p class="fallback-text">{{ error() }}</p>
+  }
+  @if (favPlaces() && favPlaces()!.length > 0) {
+    <app-places [places]="favPlaces()!" (selectPlace)="onDeletePlace($event)"></app-places>
+  } @else if (favPlaces().length === 0) {
+    <p class="fallback-text">You have no favorite places yet. Start adding some!</p>
+  }
 </app-places-container>
