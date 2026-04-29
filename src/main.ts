@@ -1,12 +1,23 @@
 import { bootstrapApplication } from '@angular/platform-browser';
 
 import { AppComponent } from './app/app.component';
-import { HttpHandlerFn, HttpRequest, provideHttpClient, withInterceptors } from '@angular/common/http';
+import { HttpEvent, HttpEventType, HttpHandlerFn, HttpRequest, provideHttpClient, withInterceptors } from '@angular/common/http';
+import { tap } from 'rxjs';
 
 function loggingInterceptor(request: HttpRequest<unknown>, next: HttpHandlerFn) {
     console.log('[Output Request]');
     console.log(request);
-    return next(request);
+    return next(request).pipe(
+        tap(
+            (event: HttpEvent<unknown>) => {
+                if( event.type === HttpEventType.Response) {
+                    console.log('[Incoming Response]');
+                    console.log(event.status);
+                    console.log(event.body);
+                }
+            }
+        )
+    );
 }
 
 
