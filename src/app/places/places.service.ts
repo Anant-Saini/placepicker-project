@@ -3,6 +3,7 @@ import { inject, Injectable, signal } from '@angular/core';
 import { Place } from './place.model';
 import { HttpClient } from '@angular/common/http';
 import { catchError, map, tap, throwError } from 'rxjs';
+import { ErrorService } from '../shared/error.service';
 
 @Injectable({
   providedIn: 'root',
@@ -10,6 +11,7 @@ import { catchError, map, tap, throwError } from 'rxjs';
 export class PlacesService {
   private userPlaces = signal<Place[]>([]);
   private httpClient = inject(HttpClient);
+  private errorService = inject(ErrorService);
 
   loadedUserPlaces = this.userPlaces.asReadonly();
 
@@ -44,10 +46,14 @@ export class PlacesService {
         }),
         catchError(() => {
           return throwError(
-            () =>
-              new Error(
-                'Something went wrong adding the place to your favorites. Please try again later!',
-              ),
+            () => {
+              this.errorService.showError(
+                'Something went wrong adding the place to your favorites. Please try again later!'
+              );
+              return new Error(
+                'Something went wrong adding the place to your favorites. Please try again later!'
+              );
+            }
           );
         })
       );
@@ -62,7 +68,12 @@ export class PlacesService {
         }),
         catchError(() => {
           return throwError(
-            () => new Error('Something went wrong. Please try deleting later!'),
+            () =>  {
+              this.errorService.showError(
+                'Something went wrong. Please try deleting later!'
+              );
+              return new Error('Something went wrong. Please try deleting later!');
+            }
           );
         }),
       );

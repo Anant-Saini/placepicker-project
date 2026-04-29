@@ -41,12 +41,7 @@ export class AvailablePlacesComponent {
 
   onSelectPlace(selectedPlace: Place) {
     this.placesService.addPlaceToUserPlaces(selectedPlace.id)
-    .subscribe({
-      next: (resBody) => { console.log('Added to Fovourites!'); },
-      error: (error: Error) => {
-        this.error.set(error.message);
-      }
-    });
+    .subscribe();
        
   }
 }
